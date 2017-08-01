@@ -27,13 +27,14 @@ I then used the output `objpoints` and `imgpoints` to compute the camera calibra
 ### Distortion correction
 
 To demonstrate this step, I will describe how I apply the distortion correction to one of the test images like this one:
-![alt text][image2]
+
+![alt text](./output_images/camera_correction.png "distortion correction")
 
 ### Thresholded binary image
 
 I used a combination of color and gradient thresholds to generate a binary image (thresholding steps at lines # through # in `another_file.py`).  Here's an example of my output for this step.  (note: this is not actually from one of the test images)
 
-![alt text][image3]
+![alt text](./output_images/threshold.png "thresholded binary image")
 
 ### Perspective transform
 
@@ -63,9 +64,15 @@ This resulted in the following source and destination points:
 
 I verified that my perspective transform was working as expected by drawing the `src` and `dst` points onto a test image and its warped counterpart to verify that the lines appear parallel in the warped image.
 
+![alt text](./output_images/perspective.png "perspective transform")
+
+![alt text](./output_images/warped_binary.png "warped binary image")
+
 ### Identify lane-line pixels and fit their positions with a polynomial
 
 Then I did some other stuff and fit my lane lines with a 2nd order polynomial kinda like this:
+
+![alt text](./output_images/lane_detection.png "lane detection")
 
 
 ### Calculate the radius of curvature of the lane and the position of the vehicle with respect to the center of the lane
@@ -76,12 +83,10 @@ I did this in lines # through # in my code in `my_other_file.py`
 
 I implemented this step in lines # through # in my code in `yet_another_file.py` in the function `map_lane()`.  Here is an example of my result on a test image:
 
+![alt text](./output_images/lane_marked.png "lane detection")
+
 ### Pipeline to process the video
+![alt text](./output_images/faint_lane.png "faint lane")
 
 Here is the processed [video](./video.mp4)
 
-### Discussion
-
-#### 1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
-
-Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further.  
