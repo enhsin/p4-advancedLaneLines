@@ -18,23 +18,25 @@ The goals / steps of this project are the following:
 
 ### Camera Calibration
 
-The code for this step is contained in the first code cell of the IPython notebook located in "./examples/example.ipynb" (or in lines # through # of the file called `some_file.py`).  
+The calibration is done in cell #2 of my IPython [notebook](./pipeline.ipynb). I used `cv2.findChessboardCorners` to find all the corners of the calibration [images](./camera_cal) and created lists of measured coordinates of chessboard corners in the image plane `imgpoints` and object points in real world space `objpoints`.
 
-I start by preparing "object points", which will be the (x, y, z) coordinates of the chessboard corners in the world. Here I am assuming the chessboard is fixed on the (x, y) plane at z=0, such that the object points are the same for each calibration image.  Thus, `objp` is just a replicated array of coordinates, and `objpoints` will be appended with a copy of it every time I successfully detect all chessboard corners in a test image.  `imgpoints` will be appended with the (x, y) pixel position of each of the corners in the image plane with each successful chessboard detection.  
+Here is an example of the corner detection. 
+![alt text](./camera_cal/corners_found1.jpg "camera calibration").
 
-I then used the output `objpoints` and `imgpoints` to compute the camera calibration and distortion coefficients using the `cv2.calibrateCamera()` function.  I applied this distortion correction to the test image using the `cv2.undistort()` function and obtained this result: 
 
 ### Distortion correction
 
-To demonstrate this step, I will describe how I apply the distortion correction to one of the test images like this one:
+With `imgpoints` and `objpoints`, the camera distortion can be corrected with `cv2.calibrateCamera()` (cell #3).
 
 ![alt text](./output_images/camera_correction.png "distortion correction")
 
 ### Thresholded binary image
 
-I used a combination of color and gradient thresholds to generate a binary image (thresholding steps at lines # through # in `another_file.py`).  Here's an example of my output for this step.  (note: this is not actually from one of the test images)
+I used a combination of color and gradient thresholds to generate a binary image (cell #4).  Here's an example of the combined threshold image for test5.jpg (left). The gradient threshold component (_blue_) and the color channel threshold component (_green_) are shown in the right.
 
 ![alt text](./output_images/threshold.png "thresholded binary image")
+
+The code is similar to the one used in the lesson (section 30) that measures the gradient in x direction in the L channel (lightness) and sets a threshold in the S channel (saturation). I also include a cut in the hue space (hue < 100) that seems to be useful picking the lane lines. 
 
 ### Perspective transform
 
@@ -77,11 +79,11 @@ Then I did some other stuff and fit my lane lines with a 2nd order polynomial ki
 
 ### Calculate the radius of curvature of the lane and the position of the vehicle with respect to the center of the lane
 
-I did this in lines # through # in my code in `my_other_file.py`
+The calculation of the radius of curvature is in cell #10 and the car's position is in cell #11.
 
 ### Warp the detected lane boundaries back onto the original image
 
-I implemented this step in lines # through # in my code in `yet_another_file.py` in the function `map_lane()`.  Here is an example of my result on a test image:
+The birds-eye view of the lane is transformed back to the normal view with `Minv` by `cv2.warpPerspective()` and overlaid on the original distortion corrected image in cell #12. An example of my result on test5.jpg is shown below.
 
 ![alt text](./output_images/lane_marked.png "lane detection")
 
