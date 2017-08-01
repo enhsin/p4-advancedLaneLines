@@ -21,8 +21,7 @@ The goals / steps of this project are the following:
 The calibration is done in cell #2 of my IPython [notebook](./pipeline.ipynb). I used `cv2.findChessboardCorners` to find all the corners of the calibration [images](./camera_cal) and created lists of measured coordinates of chessboard corners in the image plane `imgpoints` and object points in real world space `objpoints`.
 
 Here is an example of the corner detection. 
-![alt text](./camera_cal/corners_found1.jpg "camera calibration").
-
+<a href="./camera_cal/corners_found1.jpg" target="_blank"><img src="./camera_cal/corners_found1.jpg" alt="camera calibration" width="360" height="240" border="10" /></a>
 
 ### Distortion correction
 
@@ -36,7 +35,7 @@ I used a combination of color and gradient thresholds to generate a binary image
 
 ![alt text](./output_images/threshold.png "thresholded binary image")
 
-The code is similar to the one used in the lesson (section 30) that measures the gradient in x direction in the L channel (lightness) and sets a threshold in the S channel (saturation). I also include a cut in the hue space (hue < 100) that seems to be useful picking the lane lines. 
+The code is similar to the one used in the lesson (section 30) that measures the gradient in x direction in the L channel (lightness) and sets a threshold in the S channel (saturation). I also include a cut in the hue space (H < 100) that seems to be useful picking the lane lines. 
 
 ### Perspective transform
 
@@ -72,18 +71,18 @@ I verified that my perspective transform was working as expected by drawing the 
 
 ### Identify lane-line pixels and fit their positions with a polynomial
 
-Then I did some other stuff and fit my lane lines with a 2nd order polynomial kinda like this:
+I used the method taught in the lesson to find lane-line pixels (cell #8) and fit those pixels with a 2nd order polynomial. An example of the lane-line pixels (_red_ and _blue_) and the fit (_yellow_) are shown below.
 
 ![alt text](./output_images/lane_detection.png "lane detection")
 
 
 ### Calculate the radius of curvature of the lane and the position of the vehicle with respect to the center of the lane
 
-The calculation of the radius of curvature is in cell #10 and the car's position is in cell #11.
+The radius of curvature can be derived from the coefficients of the polynomial, shown in cell #10. To convert the pixel-based value to the physical value, I assume the lane is 3.7m in width and 30m in length (roughly equal to the length of 6 cars). The car's position (middle of the image) relative to the center of the lane (estimated from the polynomial fits) is in cell #11.
 
 ### Warp the detected lane boundaries back onto the original image
 
-The birds-eye view of the lane is transformed back to the normal view with `Minv` by `cv2.warpPerspective()` and overlaid on the original distortion corrected image in cell #12. An example of my result on test5.jpg is shown below.
+The birds-eye view of the lane is transformed back to the normal view with `Minv` by `cv2.warpPerspective()` and overlaid on the original distortion corrected image in cell #12. An example of the result on test5.jpg is shown below.
 
 ![alt text](./output_images/lane_marked.png "lane detection")
 
