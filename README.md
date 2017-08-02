@@ -18,7 +18,7 @@ The goals / steps of this project are the following:
 
 ### Camera Calibration
 
-The calibration is done in cell #2 of my IPython [notebook](./pipeline.ipynb). I used `cv2.findChessboardCorners` to find all the corners of the calibration [images](./camera_cal) and created lists of measured coordinates of chessboard corners in the image plane `imgpoints` and object points in real world space `objpoints`.
+The calibration is done in cell #2 of the [notebook](./pipeline.ipynb). I used `cv2.findChessboardCorners` to find all the corners of the calibration [images](./camera_cal) and created lists of measured coordinates of chessboard corners in the image plane `imgpoints` and object points in a plane (z=0) in real world space `objpoints`.
 
 Here is an example of the corner detection. 
 
