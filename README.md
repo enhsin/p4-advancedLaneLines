@@ -21,6 +21,7 @@ The goals / steps of this project are the following:
 The calibration is done in cell #2 of my IPython [notebook](./pipeline.ipynb). I used `cv2.findChessboardCorners` to find all the corners of the calibration [images](./camera_cal) and created lists of measured coordinates of chessboard corners in the image plane `imgpoints` and object points in real world space `objpoints`.
 
 Here is an example of the corner detection. 
+
 <a href="./camera_cal/corners_found1.jpg" target="_blank"><img src="./camera_cal/corners_found1.jpg" alt="camera calibration" width="360" height="240" border="10" /></a>
 
 ### Distortion correction
@@ -31,41 +32,22 @@ With `imgpoints` and `objpoints`, the camera distortion can be corrected with `c
 
 ### Thresholded binary image
 
-I used a combination of color and gradient thresholds to generate a binary image (cell #4).  Here's an example of the combined threshold image for test5.jpg (left). The gradient threshold component (_blue_) and the color channel threshold component (_green_) are shown in the right.
+I used a combination of color and gradient thresholds to generate a binary image (cell #4).  Here's an example of the combined threshold image for test_images/test5.jpg (left). The gradient threshold component (_blue_) and the color channel threshold component (_green_) are shown in the right.
 
 ![alt text](./output_images/threshold.png "thresholded binary image")
 
-The code is similar to the one used in the lesson (section 30) that measures the gradient in x direction in the L channel (lightness) and sets a threshold in the S channel (saturation). I also include a cut in the hue space (H < 100) that seems to be useful picking the lane lines. 
+The code is similar to the one used in the lesson (section 30) that measures the gradient in x direction in the L channel (lightness) and sets a threshold in the S channel (saturation). I also include a cut in the hue space (H < 100) that seems to be useful removing the shadow on the road.
 
 ### Perspective transform
 
-The code for my perspective transform includes a function called `warper()`, which appears in lines 1 through 8 in the file `example.py` (output_images/examples/example.py) (or, for example, in the 3rd code cell of the IPython notebook).  The `warper()` function takes as inputs an image (`img`), as well as source (`src`) and destination (`dst`) points.  I chose the hardcode the source and destination points in the following manner:
+Here I assume the road is flat and I'll map a straight lane line image (test_images/straight_lines1.jpg) into vertical lines. I chose 4 points `src` that form a trapezoid in the undistored source image and 4 points `dst` that form a rectangle in the transformed image (cell #5). The mapping `M` is carried out by `cv2.getPerspectiveTransform(src,dst)`.
 
-```python
-src = np.float32(
-    [[(img_size[0] / 2) - 55, img_size[1] / 2 + 100],
-    [((img_size[0] / 6) - 10), img_size[1]],
-    [(img_size[0] * 5 / 6) + 60, img_size[1]],
-    [(img_size[0] / 2 + 55), img_size[1] / 2 + 100]])
-dst = np.float32(
-    [[(img_size[0] / 4), 0],
-    [(img_size[0] / 4), img_size[1]],
-    [(img_size[0] * 3 / 4), img_size[1]],
-    [(img_size[0] * 3 / 4), 0]])
-```
-
-This resulted in the following source and destination points:
-
-| Source        | Destination   | 
-|:-------------:|:-------------:| 
-| 585, 460      | 320, 0        | 
-| 203, 720      | 320, 720      |
-| 1127, 720     | 960, 720      |
-| 695, 460      | 960, 0        |
-
-I verified that my perspective transform was working as expected by drawing the `src` and `dst` points onto a test image and its warped counterpart to verify that the lines appear parallel in the warped image.
+Here is an example of transforming the image into a bird's eye view perspective. `src` and `dst` points are drawn by red lines.
 
 ![alt text](./output_images/perspective.png "perspective transform")
+
+
+Here is the warped thresholded binary image. The lane lines appear parallel. The binary image has applied region masking (cell #6) before changing into a bird's eye view perspective. Using a mask saves me a lot of troubles finding lane-line pixels next.
 
 ![alt text](./output_images/warped_binary.png "warped binary image")
 
@@ -82,12 +64,17 @@ The radius of curvature can be derived from the coefficients of the polynomial, 
 
 ### Warp the detected lane boundaries back onto the original image
 
-The birds-eye view of the lane is transformed back to the normal view with `Minv` by `cv2.warpPerspective()` and overlaid on the original distortion corrected image in cell #12. An example of the result on test5.jpg is shown below.
+The birds-eye view of the lane is transformed back to the normal view with `Minv` by `cv2.warpPerspective()` and overlaid on the original distortion corrected image in cell #12. An example of the result on test_images/test5.jpg is shown below.
 
 ![alt text](./output_images/lane_marked.png "lane detection")
 
 ### Pipeline to process the video
-![alt text](./output_images/faint_lane.png "faint lane")
 
-Here is the processed [video](./video.mp4)
+I combined all the steps above into a single function `process_image` (cell #15) and used `VideoFileClip` learned from [Project 1](https://github.com/enhsin/p1-laneLines) to process every frame in the video. A `Line()` class (cell #13) is used to store the polynomial fit of the previous frame and to keep track some other parameters. If the lane detection of the previous frame is successful, I'll select pixels that are within the margin of the lane line detected previously to determine the new fit (see section 33 of the lesson). I define a successful detection as the difference between the curvature of the left and the right lane is no greater than 90% (be order of magnitude similar). If the detection fails, it will use the lane line from the previous fit. 
+
+The pipeline works well for most of the frame of the video, but fails to detect the left lane line around 21-23 seconds. Here is the image at 22.2 second. The lane line is quite faint. 
+
+<a href="./test_t22.jpg" target="_blank"><img src="./test_t22.jpg" alt="faint line" width="400" height="240" border="10" /></a>
+
+After lowering the lower threshold for the S channel from 170 to 80 from lots of trial and error, the left lane line can be detected well. The resulting video is [here](./video.mp4).
 
